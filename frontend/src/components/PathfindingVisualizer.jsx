@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './PathfindingVisualizer.css';
 import MatrixGridBackground from './MatrixGridBackground';
 
-const WIDTH = 50;
+const WIDTH = 40;
 const HEIGHT = 17;
 
 export default function PathfindingVisualizer() {
