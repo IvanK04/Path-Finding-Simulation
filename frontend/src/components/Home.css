@@ -1,0 +1,219 @@
+.home-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #0b0f19;
+    /* Nền tối sâu thẳm phối màu như ảnh của bạn */
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.universe {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* KHỐI TRUNG TÂM: Đặt z-index cao để chữ luôn nổi lên trên, không bị mờ */
+.center-sun {
+    position: absolute;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    pointer-events: auto;
+}
+
+.main-title {
+    font-size: 72px;
+    color: #ffffff;
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+}
+
+.explore-btn {
+    padding: 12px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background: transparent;
+    border: 0.5px solid rgba(59, 130, 246, 0.6);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+.homepage-cta {
+    position: absolute;
+
+    /* Đẩy nút xuống dưới: cách đáy của khung .universe một khoảng 60px */
+    bottom: 40px;
+    /* Số này càng nhỏ thì nút càng nằm sát cạnh dưới màn hình */
+
+    /* Cấu trúc căn giữa chuẩn pixel cho phần tử Absolute */
+    left: 50%;
+    transform: translateX(-50%);
+
+    z-index: 20;
+    /* Đảm bảo nút luôn nổi lên trên cùng để người dùng dễ click */
+}
+
+/* Tối ưu hiệu ứng hover khi nút đã có transform căn giữa */
+.homepage-cta:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+    /* Giữ nguyên translateX(-50%) để không lệch trục, và nhấc nhẹ nút lên 2px */
+    /* transform: translateX(-50%) translateY(-2px); */
+}
+
+.explore-btn:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+    /* transform: translateY(-2px); */
+}
+
+.explore-btn .arrow {
+    transition: transform 0.3s ease;
+}
+
+.explore-btn:hover .arrow {
+    transform: translateX(4px);
+}
+
+/* HỆ THỐNG QUỸ ĐẠO 3D: Ép dẹt góc nhìn tạo hình elip */
+.orbit-system {
+    position: absolute;
+    width: 750px;
+    height: 750px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* rotateX(72deg) sẽ bóp hình tròn thành elip nằm ngang dẹt,
+     rotateZ(-15deg) tạo độ nghiêng giống hệt nét vẽ phác thảo bằng tay của bạn */
+    transform: rotateX(55deg) rotateY(-25deg) rotateZ(-30deg);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* Đường kẻ viền elip */
+.orbit-ellipse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    transform-style: preserve-3d;
+    /* Kích hoạt vòng quay tổng cho toàn bộ quỹ đạo elip */
+    animation: mainOrbitRotation 25s linear infinite;
+}
+
+/* Dừng quay hệ thống khi người dùng hover chuột vào vùng elip */
+.orbit-system:hover .orbit-ellipse {
+    animation-play-state: paused;
+}
+
+/* Khung giữ vệ tinh: Đóng vai trò định vị gốc quay */
+.satellite-holder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+/* Định vị 4 vệ tinh chia đều 4 góc 90 độ trên đường viền tròn (trước khi bị bóp thành elip) */
+.sat-astar {
+    transform: rotate(0deg);
+}
+
+.sat-dijkstra {
+    transform: rotate(90deg);
+}
+
+.sat-dfs {
+    transform: rotate(180deg);
+}
+
+.sat-bfs {
+    transform: rotate(270deg);
+}
+
+/* Khối nội dung chữ hiển thị của Vệ tinh */
+.satellite-content {
+    position: absolute;
+    top: -15px;
+    /* Đặt chữ nằm cân bằng chính giữa đường kẻ viền */
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #0b0f19;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+
+    /* ĐẶC BIỆT: Khử góc nghiêng 3D của cha để chữ luôn hiển thị thẳng đứng, 
+     phẳng hướng về mắt người xem, không bị méo chữ hay lộn ngược đầu */
+    animation: antiDistortion 30s linear infinite;
+}
+
+.orbit-system:hover .satellite-content {
+    animation-play-state: paused;
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    cursor: pointer;
+}
+
+/* --- ANIMATION TÍNH TOÁN VẬT LÝ HỆ QUỸ ĐẠO --- */
+
+/* Vòng quay chính cho khung elip */
+@keyframes mainOrbitRotation {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Hàm khử biến dạng: Xoay ngược trục một góc âm (-) tương ứng với góc quay dương (+) của cha,
+   đồng thời nghiêng ngược lại trục X và Z của .orbit-system để chữ luôn vuông góc với màn hình */
+@keyframes antiDistortion {
+    0% {
+        /* transform: translateX(-50%) rotate(0deg) rotateZ(15px) rotateX(-72deg); */
+        transform: translateX(-50%) rotate(0deg) rotateZ(15px) rotateX(-72deg);
+    }
+
+    100% {
+        /* transform: translateX(-50%) rotate(-360deg) rotateZ(15deg) rotateX(-72deg); */
+        transform: translateX(-50%) rotate(0deg) rotateZ(15px) rotateX(-72deg);
+
+
+    }
+}
+
+.page-exit-active .universe {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}

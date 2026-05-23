@@ -1,0 +1,240 @@
+.visualizer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+
+    padding: 30px;
+    margin: 0;
+    background-color: black;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: black;
+}
+
+.visualizer-container h2,
+.visualizer-container p,
+.controls-bar,
+.legend-bar {
+    position: relative;
+    z-index: 20;
+}
+
+.controls-bar {
+    display: flex;
+    gap: 15px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 3px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: #475569;
+    font-size: 14px;
+}
+
+.controls-bar select,
+.controls-bar button {
+    padding: 8px 12px;
+    border-radius: 3px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    outline: none;
+}
+
+.btn-start {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-start:hover {
+    background-color: #2563eb;
+}
+
+.btn-clear {
+    background-color: #64748b;
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-clear:hover {
+    background-color: #475569;
+}
+
+.legend-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    background: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+}
+
+.legend-node {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.node-box {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    border: 1px solid black;
+}
+
+.node-box.start {
+    background-color: #A4D65E;
+}
+
+.node-box.end {
+    background-color: #D94E1D;
+}
+
+.node-box.wall {
+    background-color: #2c3e50;
+}
+
+.node-box.explored {
+    background-color: #90caf9;
+}
+
+.node-box.path {
+    background-color: #f1c40f;
+}
+
+/* CONTAINER TỔNG: Quản lý vị trí xếp chồng của lưới chính và lưới nền */
+.grid-mirror-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+/* Cấu trúc lõi của Lưới Ma Trận (Áp dụng cho cả bản chính lẫn bản sao background) */
+.grid-board {
+    display: grid;
+    background: #0f172a;
+    /* Đổi nền xương lưới sang màu tối sâu thẳm để hiệu ứng nổi bật */
+    padding: 5px;
+    border-radius: 3px;
+    user-select: none;
+    z-index: 10;
+}
+
+/* LAYER CHÍNH PHÍA TRƯỚC: Nơi người dùng vẽ tường, tương tác chuột */
+.main-interactive-grid {
+    position: relative;
+    z-index: 5;
+    /* Nằm đè lên trên layer hình nền */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* LAYER NỀN PHÍA SAU: Bản copy hoàn toàn đúng với grid người dùng */
+.background-blur-grid {
+    position: fixed;
+    /* Ép layer này thoát ly khỏi dòng chảy, tràn ra toàn bộ màn hình */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.8);
+    /* Phóng lớn ma trận lên 1.6 lần để phủ kín background */
+
+    z-index: 1;
+    /* Nằm dưới cùng */
+
+    /* HIỆU ỨNG BIẾN ĐỔI HÌNH NỀN KHÔNG GIAN: */
+    filter: blur(2px) brightness(0.4);
+    /* Làm mờ mịn các ô vuông 12px và giảm độ sáng xuống còn 40% để tránh chói mắt */
+    opacity: 0.35;
+    /* Độ trong suốt tinh tế, ẩn hiện huyền ảo phía sau */
+
+    pointer-events: none;
+    /* Chặn hoàn toàn chuột, không cho tác động vào bản copy này */
+    transition: all 0.3s ease;
+}
+
+/* 🌟 ĐỒNG BỘ HIỆU ỨNG TÔ MÀU CHO CẢ BẢN SAU:
+   Vì chúng ta gọi chung hàm {renderGrid()}, khi ô cell ở bản chính nhận class 'explored' hay 'path',
+   thì ô cell ở bản sao background cũng nhận class đó và kích hoạt hiệu ứng lóe sáng Neon tương ứng!
+*/
+.background-blur-grid .cell.explored {
+    box-shadow: 0 0 15px #90caf9;
+    /* Tạo quầng sáng neon rực rỡ dưới nền khi đang duyệt thuật toán */
+}
+
+.background-blur-grid .cell.path {
+    box-shadow: 0 0 25px #f1c40f;
+    /* Tạo hào quang vàng rực khi tìm thấy đường đi ngắn nhất */
+}
+
+.cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e2e8f0;
+    box-sizing: border-box;
+    background-color: #007C92;
+}
+
+.cell.wall {
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+.cell.start {
+    background-color: #A4D65E;
+}
+
+.cell.end {
+    background-color: #D94E1D;
+}
+
+.cell.explored {
+    background-color: #90caf9;
+    animation: explode 0.3s ease-out;
+}
+
+.cell.path {
+    background-color: #f1c40f;
+    animation: pathGlow 0.3s ease-out;
+}
+
+@keyframes explode {
+    0% {
+        transform: scale(0.3);
+        background-color: #bbdefb;
+        border-radius: 50%;
+    }
+
+    100% {
+        transform: scale(1.0);
+        background-color: #90caf9;
+    }
+}
+
+@keyframes pathGlow {
+    0% {
+        transform: scale(0.5);
+        background-color: #fff9c4;
+    }
+
+    100% {
+        transform: scale(1.0);
+        background-color: #f1c40f;
+    }
+}

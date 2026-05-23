@@ -1,9 +1,11 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.AlgorithmEvent;
 import com.example.backend.model.*;
 import java.util.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 public class DijkstraService {
@@ -95,5 +97,96 @@ public class DijkstraService {
         }
 
         return new ArrayList<>();
+    }
+
+    public void runDijkstraRealTime(Node startNode, Node endNode, Node[][] nodeGrid, boolean allowDiagonal,
+            SseEmitter emitter) {
+        int height = nodeGrid.length;
+        int width = nodeGrid[0].length;
+        int[][] directions = getDirections(allowDiagonal);
+        PriorityQueue<Node> openList = new PriorityQueue<>((a, b) -> Double.compare(a.getFScore(), b.getFScore()));
+
+        Set<Node> closedSet = new HashSet<>();
+
+        startNode.setGScore(0);
+        startNode.setFScore(0);
+        // if (allowDiagonal) {
+        // startNode.setFScore(HeuristicCalculator.octile(startNode, endNode));
+
+        // } else {
+        // startNode.setFScore(HeuristicCalculator.manhattan(startNode, endNode));
+
+        // }
+        openList.add(startNode);
+
+        try {
+            while (!openList.isEmpty()) {
+                Node current = openList.poll();
+
+                if (current.getX() == endNode.getX() && current.getY() == endNode.getY()) {
+                    List<Node> path = reconstructPath(current);
+                    for (Node pathNode : path) {
+                        if (pathNode != startNode && pathNode != endNode) {
+                            emitter.send(SseEmitter.event().name("algorithm-step")
+                                    .data(new AlgorithmEvent("PATH", pathNode.getX(), pathNode.getY())));
+                            Thread.sleep(30);
+                        }
+
+                    }
+                    emitter.send(SseEmitter.event().name("algorithm-step")
+                            .data(new AlgorithmEvent("DONE", endNode.getX(), endNode.getY())));
+                    return;
+                }
+
+                if (current != startNode) {
+                    emitter.send(SseEmitter.event().name("algorithm-step")
+                            .data(new AlgorithmEvent("EXPLORED", current.getX(), current.getY())));
+                    Thread.sleep(15);
+                }
+                closedSet.add(current);
+
+                for (int[] dir : directions) {
+                    int nextX = current.getX() + dir[0];
+                    int nextY = current.getY() + dir[1];
+
+                    if (nextX < 0 || nextX >= width || nextY < 0 || nextY >= height) {
+                        continue;
+                    }
+
+                    Node neighbor = nodeGrid[nextY][nextX];
+
+                    if (neighbor.isWall() || closedSet.contains(neighbor)) {
+                        continue;
+                    }
+
+                    double tentativeGScore = current.getGScore() + (isDiagonal(dir) ? 1.414 : 1.0);
+
+                    if (tentativeGScore < neighbor.getGScore()) {
+                        boolean isNew = !openList.contains(neighbor);
+                        if (!isNew) {
+                            openList.remove(neighbor);
+                        }
+                        neighbor.setParent(current);
+                        neighbor.setGScore(tentativeGScore);
+                        neighbor.setFScore(tentativeGScore); // in this part g_score is equal to f_score cus we dont use
+                                                             // heuristic calculation anymore
+                        // if (allowDiagonal) {
+                        // neighbor.setFScore(tentativeGScore + HeuristicCalculator.octile(neighbor,
+                        // endNode));
+                        // } else {
+                        // neighbor.setFScore(tentativeGScore + HeuristicCalculator.manhattan(neighbor,
+                        // endNode));
+                        // }
+
+                        openList.add(neighbor);
+                    }
+                }
+            }
+            emitter.send(SseEmitter.event().name("algorithm-step")
+                    .data(new AlgorithmEvent("DONE", 0, 0)));
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
+
     }
 }

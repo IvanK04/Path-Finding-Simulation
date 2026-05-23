@@ -1,0 +1,65 @@
+.matrix-bg-container {
+    /* BẮT BUỘC: Sử dụng fixed để thoát ly hoàn toàn khỏi mọi container bọc ngoài */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    /* ÉP kích thước phủ kín 100% viewport */
+    width: 100vw !important;
+    height: 100vh !important;
+
+    z-index: 0;
+    /* Cho nằm hẳn dưới cùng */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 30px);
+    grid-auto-rows: 30px;
+
+    /* ĐỒNG BỘ MÀU NỀN: Trùng với màu tối của cả trang web */
+    background-color: #0b0f19;
+    opacity: 0.12;
+    overflow: hidden;
+    pointer-events: none;
+    /* Không cản trở click chuột */
+}
+
+.bg-cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    /* Đường lưới mảnh, ẩn hiện tinh tế */
+    box-sizing: border-box;
+    background-color: transparent;
+}
+
+/* HIỆU ỨNG NHẤP NHÁY Ô CHUYỂN MÀU MẠCH ĐIỆN TỬ */
+.bg-cell.blink-active {
+    animation: pixelBlink 1.5s ease-out forwards;
+}
+
+@keyframes pixelBlink {
+    0% {
+        background-color: rgba(255, 255, 255, 0.8);
+        /* Bừng sáng trắng ngay khi kích hoạt */
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+
+    20% {
+        background-color: #f1c40f;
+        /* Chuyển nhanh sang màu vàng gold của đường đi ngắn nhất */
+        box-shadow: 0 0 12px rgba(241, 196, 15, 0.6);
+    }
+
+    100% {
+        background-color: transparent;
+        /* Mờ dần về trạng thái trống ban đầu */
+        box-shadow: none;
+    }
+}
+
+.page-exit-active .matrix-bg-container {
+    opacity: 0 !important;
+    transform: scale(0.9);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
