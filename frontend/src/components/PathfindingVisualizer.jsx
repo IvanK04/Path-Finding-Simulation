@@ -270,7 +270,7 @@ export default function PathfindingVisualizer() {
             </div>
 
             {/* ✅ KHU VỰC HIỂN THỊ LỊCH SỬ ĐÃ ĐƯỢC KẾT NỐI DATA STATE */}
-            <div className="history-panel">
+            {/* <div className="history-panel">
                 <h3 className="history-title">⏱️ Execution History (Maximum 5 recent runs)</h3>
                 {history.length === 0 ? (
                     <p className="history-empty">No simulation data yet. Click "Simulate" to start!</p>
@@ -295,7 +295,7 @@ export default function PathfindingVisualizer() {
                         ))}
                     </div>
                 )}
-            </div>
+            </div> */}
 
         </div>
     );
