@@ -34,7 +34,7 @@ export default function Home({ onStart }) {
                 </div>
 
                 <button className="explore-btn homepage-cta" onClick={onStart}>
-                    Khám Phá Mô Phỏng
+                    Go to simulation
                     <span className="arrow">→</span>
                 </button>
 
