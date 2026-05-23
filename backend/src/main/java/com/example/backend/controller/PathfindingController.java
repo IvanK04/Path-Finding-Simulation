@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/pathfinding")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://striking-hope-production-4b5d.up.railway.app/")
 public class PathfindingController {
 
     @Autowired
